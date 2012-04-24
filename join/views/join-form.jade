@@ -1,0 +1,22 @@
+h3 회원가입
+p 회원가입해!!
+form(id='joinForm', method='POST',action='/join')
+  label(for='name') 이름:
+  input(type='text', name='name',id='name')
+  label(for='email') email:
+  input(type='text', name='email',id='email')
+  input(type='submit', value='전송')
+
+script(type='text/javascript')
+  $(document).ready(function(){
+    $('#joinForm').submit(function(e){
+      if($.trim($('#name').val()) === ''){
+        alert('이름을 입력해!!!');
+        return false;
+      }
+      if($.trim($('#email').val()) === ''){
+        alert('메일을 입력해!!!');
+        return false;
+      }
+    });
+  });

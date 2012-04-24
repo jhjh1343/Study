@@ -1,0 +1,15 @@
+h1 채팅방
+form(action='/enter', method='post')
+ label(for='nickname') 닉네임을입력해주세요.
+ input(type='text', id='nickname',name='nickname')
+ input(type='submit',value='입장')
+
+script(type='text/javascript')
+ $(document).ready(function(){
+  $('form').submit(function(e){
+   if($.trim($('#nickname').val()) === ''){
+    alert('닉네임을 입력하시오!!');
+    return false;
+   }
+  });
+ });

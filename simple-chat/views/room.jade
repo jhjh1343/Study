@@ -1,0 +1,56 @@
+-if(!isSuccess)
+ script
+  alert('방에입장 불가능!!')
+  location.href='/enter';
+-else
+ h3 방제:
+  span#roomname= roomname
+
+ #chatWindow(style='width:400px; height:400px; overflow:auto; border:1px solid #000; float:left; margin-right:10px;')
+ div(style='width:100px; height:400px; overflow:auto; border:1px solid #000;')
+  p 참가자
+  ul#attendants
+
+ form
+  span#myName #{nickname}
+  input(type='text', style='width:300px;')#message
+  input(type='submit', value='보내기')
+
+ script(type='text/javascript')
+   $(document).ready(function(){
+    var room = io.connect('/room');
+    var chatWindow = $('#chatWindow');
+    var messageBox = $('#message');
+    var myName = $('#myName').text();
+
+    function showMessage(msg){
+    chatWindow.append($('<p>').text(msg));
+    chatWindow.scrollTop(chatWindow.height());
+    };
+
+    room.on('connect',function(){
+     room.emit('join',{roomname:$('#roomname').text(),nickname:myName});
+    });
+
+    room.on('joined',function(data){
+     if(data.isSuccess){
+      showMessage(data.nickname+ '님이 입장하셨습니다.');
+     }
+    });
+
+    
+
+    $('form').submit(function(e) {
+     e.preventDefault();
+     var msg = messageBox.val();
+     if ($.trim(msg) !== '') {
+      showMessage(myName + ' : ' + msg);
+      room.json.send({nickname:myName, msg:msg});
+      messageBox.val('');
+     }
+    });
+
+    room.on('message', function(data) {
+     showMessage(data.nickname + ' : ' + data.msg); 
+    });
+   });

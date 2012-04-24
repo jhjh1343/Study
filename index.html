@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <title>Socket.IO 예제</title>
+    <script type="text/javascript" src="/socket.io/socket.io.js">
+    </script>
+  </head>
+  <body>
+  	<div id="contents" style="width:300px; height:200px; overflow:auto;border:1px solid #000;">
+  	</div>
+  	<input type="button" id="joinBtn" value="입장하기"/>
+  	<input type="button" id="leaveBtn" value="나가기"/>
+  	<script type="text/javascript">
+  		window.onload=function(){
+  			var socket = io.connect('http://localhost:3000',{'reconnect':true,'resource':'socket.io'});
+
+  			socket.on('connect',function(){
+  				printMessage('연결됐습니다');
+  				socket.send('클라이언트 message 테스트');
+  			});
+
+  			socket.send('send로 보내는 메시지',function(){
+  				printMessage('메시지가 전달됐습니다');
+  			});
+
+  			socket.on('message',function(msg){
+  				printMessage(msg);
+  			});
+
+  			socket.emit('from client',{text:'클라이언트에서 보낸 메시지입니다.'});
+
+  			socket.on('from server',function(data,callback){
+  				printMessage(data.text);
+  				callback('정상ㅇ적으로 이벤트를 받았다.');
+  			});
+
+  			socket.on('as volatile',function(time){
+  				printMessage(time);
+  			});
+
+  			var contents = document.getElementById('contents');
+  			function printMessage(msg){
+  				var p = document.createElement("p");
+  				if(p.textContent){
+  					p.textContent = msg;
+  				}else{
+  					p.innerText = msg;
+
+  				}
+  				contents.appendChild(p);
+  			}
+
+  			var another = io.connect('/another');
+  			another.on('connect',function(){
+  				printMessage('another에 연결되었습니다.');
+  			});
+  			another.on('message',function(msg){
+  				printMessage(msg);
+  				another.emit('nickname','jhjh1343');
+  			});
+
+  			another.on('nickname',function(nickname){
+  				printMessage(nickname);
+  			});
+
+
+  			if(document.addEventListener){
+  				document.getElementById('joinBtn').addEventListener('click',join);
+  				document.getElementById('leaveBtn').addEventListener('click',leave);
+  			}else{
+  				document.getElementById('joinBtn').attachEvent('onClick',join);
+  				document.getElementById('leaveBtn').attachEvent('onClick',leave);
+  			}
+
+  			function join(){
+  				printMessage('방에 입장했숑');
+  				another.emit('joinroom','조인한다.');
+  			}
+
+  			function leave(){
+  				printMessage('방을 나갔숑');
+  				another.emit('leaveroom','나갑니다.');
+  			}
+
+  		};
+  	</script>
+  </body>
+</html>
